@@ -9,8 +9,10 @@ services:
       - "--entrypoints.websecure.address=:443"
       - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
       - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
-      - "--certificatesresolvers.myresolver.acme.email=adrian.wojewoda@email.pl"
+      - "--certificatesresolvers.myresolver.acme.email=adrian.wojewoda@gmail.pl"
       - "--certificatesresolvers.myresolver.acme.storage=/acme.json"
+      - "--log.level=INFO"
+      - "--accesslog=true"
     ports:
       - "80:80"
       - "443:443"
@@ -24,8 +26,19 @@ services:
     container_name: whoami
     labels:
       - "traefik.enable=true"
+
+      # HTTP router (port 80)
       - "traefik.http.routers.whoami.rule=Host(`erp.adiwoj.pl`)"
-      - "traefik.http.routers.whoami.entrypoints=websecure"
-      - "traefik.http.routers.whoami.tls=true"
-      - "traefik.http.routers.whoami.tls.certresolver=myresolver"
+      - "traefik.http.routers.whoami.entrypoints=web"
+      - "traefik.http.routers.whoami.middlewares=redirect-to-https"
+
+      # redirect middleware
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+
+      # HTTPS router (port 443)
+      - "traefik.http.routers.whoami-secure.rule=Host(`erp.adiwoj.pl`)"
+      - "traefik.http.routers.whoami-secure.entrypoints=websecure"
+      - "traefik.http.routers.whoami-secure.tls=true"
+      - "traefik.http.routers.whoami-secure.tls.certresolver=myresolver"
     restart: unless-stopped
