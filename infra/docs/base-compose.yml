@@ -1,7 +1,25 @@
 services:
+  traefik:
+    image: traefik:v3.6
+    container_name: traefik
+    command:
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.traefik.address=:8080"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+
   whoami:
     image: traefik/whoami
     container_name: whoami
-    ports:
-      - "80:80"
-
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`87.106.91.201`)"
+      - "traefik.http.routers.whoami.entrypoints=web"
+    restart: unless-stopped
