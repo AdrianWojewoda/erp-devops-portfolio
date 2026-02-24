@@ -98,5 +98,5 @@ services:
       - "traefik.http.services.erp.loadbalancer.server.port=8000"
     restart: unless-stopped
 
-  volumes:
-     postgres_data:
+volumes:
+  postgres_data:
