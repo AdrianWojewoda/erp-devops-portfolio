@@ -138,6 +138,7 @@ Architecture Decisions:
 - [docs/adr/0001-traefik.md](docs/adr/0001-traefik.md)
 - [docs/adr/0002-letsencrypt.md](docs/adr/0002-letsencrypt.md)
 - [docs/adr/0003-observability.md](docs/adr/0003-observability.md)
+- [docs/adr/0004-deployment-model.md](docs/adr/0004-deployment-model.md)
 
 ---
 
