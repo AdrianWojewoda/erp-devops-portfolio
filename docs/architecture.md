@@ -14,7 +14,7 @@ flowchart LR
   U[User / Browser] -->|HTTPS| RP[Reverse Proxy: Traefik]
   RP --> S1[Service: ERP]
   RP --> S2[Service: Grafana]
-  S1 --> DB(PostgreSQL]
+  S1 --> DB[PostgreSQL]
   RP --> M[Metrics endpoint]
   M --> P[Prometheus]
   P --> G[Grafana]
