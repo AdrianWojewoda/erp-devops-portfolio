@@ -83,12 +83,21 @@ services:
     depends_on:
       - db
     labels:
-       - "traefik.enable=true"
-       - "traefik.http.routers.erp.rule=Host(`erp.adiwoj.pl`)"
-       - "traefik.http.routers.erp.entrypoints=websecure"
-       - "traefik.http.routers.erp.tls=true"
-       - "traefik.http.routers.erp.tls.certresolver=myresolver"
-       - "traefik.http.services.erp.loadbalancer.server.port=8000"
+      - "traefik.enable=true"
+
+      # HTTP -> HTTPS
+      - "traefik.http.routers.erp.rule=Host(`erp.adiwoj.pl`)"
+      - "traefik.http.routers.erp.entrypoints=web"
+      - "traefik.http.routers.erp.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+
+      # HTTPS
+      - "traefik.http.routers.erp-secure.rule=Host(`erp.adiwoj.pl`)"
+      - "traefik.http.routers.erp-secure.entrypoints=websecure"
+      - "traefik.http.routers.erp-secure.tls=true"
+      - "traefik.http.routers.erp-secure.tls.certresolver=myresolver"
+      - "traefik.http.services.erp.loadbalancer.server.port=8000"
     restart: unless-stopped
 
   volumes:

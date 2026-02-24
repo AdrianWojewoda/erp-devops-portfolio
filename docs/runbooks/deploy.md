@@ -98,3 +98,29 @@ docker compose up -d
 Only Traefik should bind ports 80/443 publicly.
 
 Keep admin interfaces unexposed unless protected and intentional.
+
+## One-command deploy
+
+A single script is provided for repeatable deployments on the VPS:
+
+```bash
+cd /srv/erp/repo
+./scripts/deploy.sh
+```
+
+### What it does:
+
+- git pull (fast-forward only)
+- validates the runtime compose config
+- docker compose up -d --build
+- prints container status
+
+
+---
+
+## 3) Commit
+
+```bash
+git add scripts docs/runbooks/deploy.md
+git commit -m "feat: add deployment script and document one-command deploy"
+git push
