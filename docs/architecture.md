@@ -18,8 +18,17 @@ flowchart LR
   RP --> M[Metrics endpoint]
   M --> P[Prometheus]
   P --> G[Grafana]
-
 ```
+
+User/Browser
+    |
+   HTTPS
+    v
+  Traefik  --->  ERP App  --->  PostgreSQL
+    |
+    +----->  Grafana
+    |
+    +----->  Metrics  --->  Prometheus  --->  Grafana
 
 ## Containers (C4 - Level 2)
 
