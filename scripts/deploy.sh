@@ -20,9 +20,13 @@ echo "==> Running containers:"
 docker ps
 
 echo "==> Done."
-
 echo "==> Smoke tests (wait up to 60s):"
 
+<<<<<<< HEAD
+echo "==> Smoke tests (wait up to 60s):"
+
+=======
+>>>>>>> b56230b593a82cef9b4dc2592abb858f32f6bb9b
 retry() {
   local name="$1"
   local cmd="$2"
@@ -43,4 +47,8 @@ retry() {
 
 # Prefer local Traefik routing to avoid DNS/TLS flakiness:
 retry "ERP health"    'curl -fsS -H "Host: erp.adiwoj.pl" http://127.0.0.1/health'
+<<<<<<< HEAD
 retry "ERP readiness" 'curl -fsS -H "Host: erp.adiwoj.pl" http://127.0.0.1/readiness'
+=======
+retry "ERP readiness" 'curl -fsS -H "Host: erp.adiwoj.pl" http://127.0.0.1/readiness'
+>>>>>>> b56230b593a82cef9b4dc2592abb858f32f6bb9b
