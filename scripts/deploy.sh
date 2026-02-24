@@ -20,3 +20,7 @@ echo "==> Running containers:"
 docker ps
 
 echo "==> Done."
+
+echo "==> Smoke tests:"
+curl -fsS https://erp.adiwoj.pl/health >/dev/null && echo "ERP health: OK"
+curl -fsS https://erp.adiwoj.pl/readiness >/dev/null && echo "ERP readiness: OK"
