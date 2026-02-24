@@ -195,3 +195,9 @@ Focus areas:
 ## Why This Project Exists
 
 This repository documents the incremental evolution of a production-ready stack starting from a clean VPS and building toward a secure, observable, and automated infrastructure platform.
+
+---
+
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Docker](https://img.shields.io/badge/docker-compose-blue)
+![Observability](https://img.shields.io/badge/observability-prometheus%20%2B%20grafana-orange)
