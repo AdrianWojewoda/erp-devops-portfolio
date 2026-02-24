@@ -63,13 +63,10 @@ No cron job required.
 ### Common failure modes
 
 Port 80 blocked by firewall/security group → HTTP-01 challenge fails.
-
 DNS not pointing to VPS → challenge fails.
-
 Wrong Host rules → router not matching, causing 404 (ACME still needs port 80 reachable).
 
 ### Security notes
 
 acme.json contains sensitive data. Keep file permissions strict and never publish it.
-
 Prefer redirecting all HTTP to HTTPS after validating ACME works.

@@ -2,28 +2,33 @@
 
 Production-like infrastructure for a web-based ERP system running on a single Ubuntu VPS.
 
-This repository documents the incremental evolution of a secure, observable and TLS-enabled environment designed using modern DevOps practices.
+This project demonstrates infrastructure design, reverse proxy architecture, automated TLS, observability integration, and documentation-driven DevOps practices.
 
 ---
 
-## 🔎 Project Status
+## Current Milestone
 
-Current milestone: **v0.3 – Reverse Proxy + TLS + Observability Baseline**
+v0.4 – Reverse Proxy + TLS + Observability + Application Layer
 
-- VPS hardening
-- Dockerized infrastructure
-- Traefik reverse proxy
-- Automated HTTPS (Let's Encrypt)
-- Prometheus metrics
-- Grafana visualization
-- Infrastructure documentation (C4, ADR, Runbooks)
+Implemented:
+
+- VPS hardening (SSH, UFW, Fail2ban)
+- Docker-based service isolation
+- Traefik reverse proxy (v3)
+- Automated HTTPS via Let's Encrypt (ACME HTTP-01)
+- Prometheus metrics collection
+- Grafana dashboards
+- FastAPI backend
+- PostgreSQL database
+- One-command deployment script
+- C4 documentation + ADR + runbooks
 
 ---
 
 ## Live Endpoints
 
-- ERP (test service): https://erp.adiwoj.pl
-- Observability: https://grafana.adiwoj.pl
+- ERP API: https://erp.adiwoj.pl
+- Observability (Grafana): https://grafana.adiwoj.pl
 
 ---
 
@@ -31,31 +36,30 @@ Current milestone: **v0.3 – Reverse Proxy + TLS + Observability Baseline**
 
 This project focuses on infrastructure maturity rather than application complexity.
 
-Key DevOps capabilities demonstrated
+DevOps capabilities:
 
-- Reverse proxy routing by subdomain
-- Automated TLS with ACME (no manual cert handling)
-- Docker-based service isolation
-- Internal vs public networking separation
-- Firewall + SSH hardening
-- Observability stack integration
-- Infrastructure documentation (C4, ADRs, runbooks)
-- Incremental, versioned evolution
+- Subdomain-based routing via reverse proxy
+- Automated TLS issuance and renewal
+- Public vs internal network separation
+- Metrics exposure and scraping
+- Infrastructure as Code (Docker Compose)
+- Secure server baseline
+- Deployment automation
+- Architecture documentation
 
 ---
 
 ## Architecture Overview
 
-### High-Level Flow
-
 ```mermaid
 flowchart LR
-  User -->|HTTPS| Traefik
-  Traefik --> ERP
-  Traefik --> Grafana
-  Traefik --> Metrics
-  Metrics --> Prometheus
-  Prometheus --> Grafana
+  U[User] -->|HTTPS| T[Traefik]
+  T --> ERP[FastAPI Backend]
+  T --> G[Grafana]
+  ERP --> DB[(PostgreSQL)]
+  T --> M[Metrics Endpoint]
+  M --> P[Prometheus]
+  P --> G
 ```
 
 ## Network Model
@@ -139,6 +143,15 @@ Milestones:
 
 ---
 
+## Deployment
+
+```bash
+cd /srv/erp/repo
+bash ./scripts/deploy.sh
+```
+
+---
+
 ## Roadmap
 
 - [ ] FastAPI ERP backend
@@ -165,6 +178,6 @@ Focus areas:
 
 ---
 
-## 📌 Why This Project Exists
+## Why This Project Exists
 
-This repository demonstrates the incremental evolution of a production-ready stack, starting from a clean VPS to a secured, observable environment ready for application deployment.
+This repository documents the incremental evolution of a production-ready stack starting from a clean VPS and building toward a secure, observable, and automated infrastructure platform.

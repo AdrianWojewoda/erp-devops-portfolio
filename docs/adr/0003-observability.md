@@ -3,15 +3,19 @@
 ## Status
 Accepted
 
+
 ## Context
 
-The project requires visibility into:
-- request volume
-- error rates
-- latency
-- service health
+Infrastructure without visibility is operationally blind.
 
-As this is a DevOps portfolio project, observability is a key demonstration area.
+The project requires:
+
+- Request monitoring
+- Error rate tracking
+- Latency observation
+- Service health validation
+
+---
 
 ## Decision
 
@@ -20,6 +24,8 @@ Use:
 - Grafana for visualization
 - Traefik as metrics exporter
 
+---
+
 ## Rationale
 
 - Prometheus is industry standard
@@ -27,23 +33,26 @@ Use:
 - Easy extension to future services
 - Clear separation between public and internal services
 
-## Alternatives Considered
-
-- Cloud-based monitoring (not suitable for self-hosted VPS demo)
-- Direct Grafana scraping without Prometheus (less scalable)
+---
 
 ## Consequences
 
-Positive:
-- Clear insight into reverse proxy traffic
-- Scalable for future services
+### Positive
 
-Negative:
-- Additional operational complexity
-- Requires documentation and maintenance
+- Early detection of failures
+- Measurable performance metrics
+- Foundation for SLO/SLI implementation
+
+### Trade-offs
+
+- Increased operational complexity
+- Additional maintenance overhead
+
+---
 
 ## Future Direction
 
-- Add Loki for logs
-- Add Alertmanager for alerting
-- Define SLO-based dashboards
+- Loki for centralized logs
+- Alertmanager for alerting
+- SLO dashboards
+- Error budget tracking

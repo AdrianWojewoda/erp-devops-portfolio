@@ -1,52 +1,100 @@
-
 # Runbook: Deploy / Restart
 
 ## Scope
 
 This runbook describes how to operate the current stack on the VPS:
+
 - Traefik (reverse proxy + TLS)
-- whoami (temporary test service)
+- ERP Backend (FastAPI)
+- PostgreSQL
 - Prometheus
 - Grafana
 
 ## Preconditions
 
 - You have SSH access as `devops` (key-based).
-- Project runtime directory on VPS: `/srv/erp/app`
-- Docker + docker compose plugin installed.
+- Runtime directory: `/srv/erp/app`
+- Repository directory: `/srv/erp/repo`
+- Docker + Docker Compose v2 plugin installed.
 
-## Common operations
+---
 
-### Connect to VPS
+## Connect to VPS
 
 ```bash
 ssh devops@<VPS_IP>
 ```
 
+## Common operations
 
-### Check running containers
+---
+
+## Quick Status
 
 ```bash
 cd /srv/erp/app
-docker ps
+docker compose ps
 ```
 
-### Restart the whole stack (safe default)
+---
+
+## Validate config (no changes applied):
+
+```bash
+cd /srv/erp/app
+docker compose config
+```
+
+---
+
+## Standard Deployment (recommended)
+
+```bash
+cd /srv/erp/repo
+./scripts/deploy.sh
+```
+
+### What The Script Does
+
+1. Pulls latest changes (fast-forward only)
+2. Validates compose configuration
+3. Builds and recreates containers
+4. Displays running containers
+5. Executes smoke tests:
+- GET /health
+- GET /readiness
+
+---
+
+## Restart / Recreate
+
+Safe default (reconcile desired state):
+
+```bash
+cd /srv/erp/app
+docker compose up -d --build
+```
+
+Hard restart (stops and starts containers, keeps volumes):
+
+```bash
+cd /srv/erp/app
+docker compose restart
+```
+
+Full teardown (use only when required):
 
 ```bash
 cd /srv/erp/app
 docker compose down
-docker compose up -d
+docker compose up -d --build
 ```
 
-### Apply configuration changes (compose file modified)
+---
 
-```bash
-cd /srv/erp/app
-docker compose up -d
-```
+## Manual Deployment
 
-### Pull newer images (manual update)
+If needed:
 
 ```bash
 cd /srv/erp/app
@@ -54,73 +102,87 @@ docker compose pull
 docker compose up -d
 ```
 
-### Troubleshooting
+## Logs
 
-```bash
-Traefik logs
-docker logs traefik --tail=200
-```
-
-### Prometheus logs
-
-```bash
-docker logs prometheus --tail=200
-```
-
-### Grafana logs
-
-```bash
-docker logs grafana --tail=200
-```
-
-### Validate compose syntax (no changes applied)
+Traefik:
 
 ```bash
 cd /srv/erp/app
-docker compose config
+docker logs app-traefik-1 --tail=200
 ```
 
-### Rollback
-
-If an update breaks the stack:
-
-revert /srv/erp/app/docker-compose.yml to the previous version (keep copies or use your repo history),
-
-restart the stack:
+Backend:
 
 ```bash
-docker compose down
-docker compose up -d
+cd /srv/erp/app
+docker logs app-backend-1 --tail=200
 ```
 
-### Notes
-
-Only Traefik should bind ports 80/443 publicly.
-
-Keep admin interfaces unexposed unless protected and intentional.
-
-## One-command deploy
-
-A single script is provided for repeatable deployments on the VPS:
+Database:
 
 ```bash
-cd /srv/erp/repo
-./scripts/deploy.sh
+cd /srv/erp/app
+docker compose logs db --tail=200
 ```
 
-### What it does:
+Prometheus:
 
-- git pull (fast-forward only)
-- validates the runtime compose config
-- docker compose up -d --build
-- prints container status
+```bash
+cd /srv/erp/app
+docker compose logs prometheus --tail=200
+```
 
+Grafana:
+
+```bash
+cd /srv/erp/app
+docker compose logs grafana --tail=200
+```
+---
+
+## Smoke Tests
+
+From VPS (via Traefik locally):
+
+```bash
+curl -fsS -H "Host: erp.adiwoj.pl" http://127.0.0.1/health
+curl -fsS -H "Host: erp.adiwoj.pl" http://127.0.0.1/readiness
+```
+
+From your local machine:
+
+```bash
+curl -fsS https://erp.adiwoj.pl/health
+curl -fsS https://erp.adiwoj.pl/readiness
+```
 
 ---
 
-## 3) Commit
+## Rollback
+
+### Option A: rollback to a previous commit
 
 ```bash
-git add scripts docs/runbooks/deploy.md
-git commit -m "feat: add deployment script and document one-command deploy"
-git push
+cd /srv/erp/repo
+git reset --hard <commit_sha>
+bash ./scripts/deploy.sh
+```
+
+### Option B: rollback to previous images (if applicable)
+
+```bash
+cd /srv/erp/app
+docker compose up -d
+```
+
+## Notes / Guardrails
+
+- Only Traefik should bind ports 80/443 publicly.
+- Never expose Postgres or Prometheus externally.
+- ACME storage (acme.json) must never be committed.
+- Runtime secrets should live in /srv/erp/app/.env (not in git).
+
+## **Known issues**
+
+- “Smoke tests may fail immediately after recreation; deploy script retries for up to 60s”
+- “If VPS repo diverges after force push: `git fetch --all && git reset --hard origin/main`”

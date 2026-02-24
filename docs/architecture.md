@@ -1,11 +1,14 @@
 # Architecture
 
-## Goals
+## Objectives
 
-- Provide a production-like baseline on a single Ubuntu VPS.
-- Use containerization and reverse proxy routing by subdomains.
-- Automate TLS with Let's Encrypt (ACME).
-- Build a foundation for an ERP web app (later) with DevOps practices: security, repeatability, observability.
+- Provide a production-like baseline on a single Ubuntu VPS
+- Implement secure reverse proxy routing
+- Automate TLS management
+- Integrate observability from day one
+- Prepare foundation for ERP backend evolution
+
+---
 
 ## System context (C4 - Level 1)
 
@@ -24,22 +27,44 @@ flowchart LR
 
 ### Public entrypoints
 
-- Traefik: terminates TLS, routes requests by Host() rules.
-- entrypoint web :80 (HTTP)
-- entrypoint websecure :443 (HTTPS)
-- (internal) entrypoint metrics :8082 (Prometheus scrape)
+Traefik:
+- terminates TLS
+- routes requests by Host() rules.
+- Handles ACME challenges
 
-### Services
+Public ports:
+- 80 (HTTP)
+- 443 (HTTPS)
 
-- whoami (temporary): test service to validate routing + TLS + redirects.
-- prometheus: scrapes Traefik metrics from internal network.
-- grafana: visualization (exposed via Traefik under grafana.adiwoj.pl).
+### Application Layer
+
+- FastAPI backend
+- PostgreSQL database
+
+Database is internal-only, not publicly exposed.
+
+### Observability Layer
+
+- Prometheus (internal metrics scraping)
+- Grafana (exposed via Traefik)
+- Traefik Prometheus exporter
+
+Metrics endpoint (:8082) is internal-only.
 
 ### Networking model
 
-- Only ports exposed to the public internet: 80/443 (plus SSH 22).
-- Application/monitoring services are not exposed directly; they are reached via Traefik routing.
-- Internal scraping (Prometheus -> Traefik metrics) happens within the Docker network.
+Public:
+- 22 (SSH)
+- 80 (HTTP)
+- 443 (HTTPS)
+
+Internal:
+- 8000 (backend)
+- 5432 (Postgres)
+- 9090 (Prometheus)
+- 8082 (Traefik metrics)
+
+Only Traefik binds public ports.
 
 ### DNS / Hostnames
 
@@ -49,8 +74,17 @@ flowchart LR
 
 ### Data & persistence
 
-- Traefik ACME state stored in /srv/erp/app/acme.json (bind-mounted into Traefik).
-- Future: PostgreSQL data in /srv/erp/data/postgres and backups in /srv/erp/backups.
+- PostgreSQL → Docker volume
+- ACME state → bind-mounted file
+- Grafana provisioning → configuration as code
+
+### Design Principles
+
+- Least privilege exposure
+- Edge TLS termination
+- Infrastructure defined declaratively
+- Incremental evolution
+- Observability-first mindset
 
 ### Security baseline (current)
 
