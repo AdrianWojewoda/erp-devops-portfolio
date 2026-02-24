@@ -2,7 +2,20 @@
 
 Production-like infrastructure for a web-based ERP system running on a single Ubuntu VPS.
 
-This project demonstrates infrastructure design, reverse proxy architecture, automated TLS, observability integration, and documentation-driven DevOps practices.
+## What This Project Demonstrates
+
+This project focuses on infrastructure maturity rather than application complexity.
+
+DevOps capabilities:
+
+- Subdomain-based routing via reverse proxy
+- Automated TLS issuance and renewal
+- Public vs internal network separation
+- Metrics exposure and scraping
+- Infrastructure as Code (Docker Compose)
+- Secure server baseline
+- Deployment automation
+- Architecture documentation
 
 ---
 
@@ -32,23 +45,6 @@ Implemented:
 
 ---
 
-## What This Project Demonstrates
-
-This project focuses on infrastructure maturity rather than application complexity.
-
-DevOps capabilities:
-
-- Subdomain-based routing via reverse proxy
-- Automated TLS issuance and renewal
-- Public vs internal network separation
-- Metrics exposure and scraping
-- Infrastructure as Code (Docker Compose)
-- Secure server baseline
-- Deployment automation
-- Architecture documentation
-
----
-
 ## Architecture Overview
 
 ```mermaid
@@ -61,14 +57,6 @@ flowchart LR
   M --> P[Prometheus]
   P --> G
 ```
-
-## Network Model
-
-- Public ports: 22 (SSH), 80 (HTTP), 443 (HTTPS)ns
-- Only Traefik binds to 80/443
-- Prometheus and metrics entrypoints are internal-only
-- TLS termination at edge (Traefik)
-
 ---
 
 ## Tech Stack
@@ -86,20 +74,53 @@ flowchart LR
 
 ---
 
-## Deployment Model
+## Network Model
 
-Current model:
-- Single VPS
-- SSH-based deployment
-- Docker Compose
+Public:
+- 22 (SSH)
+- 80 (HTTP)
+- 443 (HTTPS)
 
-Planned evolution:
-- GitHub Actions CI validation
-- Image scanning (Trivy)
-- Infrastructure provisioning via Ansible
-- Log aggregation (Loki)
-- Alerts (Alertmanager)
-- Application layer (FastAPI + PostgreSQL)
+Internal:
+- 8000 (backend)
+- 5432 (Postgres)
+- 9090 (Prometheus)
+- 8082 (Traefik metrics)
+
+Only Traefik binds public ports.
+
+TLS termination occurs at the edge.
+
+---
+
+## Operational Characteristics
+
+- Idempotent deployment [deploy.md](docs/runbooks/deploy.md)
+- Health-based validation before marking deploy successful
+- HTTP → HTTPS enforced
+- Metrics isolated from public network
+- Runtime secrets excluded from repository
+- ACME storage not committed
+
+
+## Deployment
+
+On VPS:
+
+```bash
+cd /srv/erp/repo
+bash ./scripts/deploy.sh
+```
+
+### What The Script Does
+
+1. Pulls latest changes (fast-forward only)
+2. Validates compose configuration
+3. Builds and recreates containers
+4. Displays running containers
+5. Executes smoke tests:
+- GET /health
+- GET /readiness
 
 ---
 
@@ -122,13 +143,13 @@ Architecture Decisions:
 
 ## Security Baseline
 
-- Root SSH login disabled
+- Root login disabled
 - Password authentication disabled
-- Key-based SSH only
+- SSH key-based access only
 - UFW restricting public exposure
 - Fail2ban enabled
 - ACME key material excluded from repository
-- Metrics endpoints not publicly exposed
+- Prometheus not publicly exposed
 
 ---
 
@@ -136,32 +157,24 @@ Architecture Decisions:
 
 Milestones:
 - v0.1 – VPS hardening + Docker baseline
-- v0.2 – Traefik + Automated TLSd
+- v0.2 – Traefik + Automated TLS
 - v0.3 – Observability stack
-- v0.4 – Application layer (planned)
+- v0.4 – Application layer
 - v1.0 – Production-ready ERP stack
-
----
-
-## Deployment
-
-```bash
-cd /srv/erp/repo
-bash ./scripts/deploy.sh
-```
 
 ---
 
 ## Roadmap
 
-- [ ] FastAPI ERP backend
-- [ ] PostgreSQL with migrations
-- [ ] Healthchecks & readiness probes
+- [x] FastAPI ERP backend
+- [x] PostgreSQL with migrations
+- [x] Healthchecks & readiness probes
 - [ ] CI pipeline validation
-- [ ] Container image scanning
+- [ ] Container image scanning (Trivy)
 - [ ] Loki (centralized logs)
 - [ ] Alertmanager
 - [ ] Infrastructure provisioning via Ansible
+- [ ] Database migrations (Alembic)
 
 ---
 

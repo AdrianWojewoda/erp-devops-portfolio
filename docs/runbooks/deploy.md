@@ -66,6 +66,15 @@ cd /srv/erp/repo
 
 ---
 
+## Idempotency
+
+The deployment process is idempotent.
+
+Running `deploy.sh` multiple times will reconcile the desired state without manual cleanup.
+Containers are recreated only if configuration or images changed.
+
+---
+
 ## Restart / Recreate
 
 Safe default (reconcile desired state):

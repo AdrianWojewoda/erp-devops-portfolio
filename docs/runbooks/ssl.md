@@ -26,6 +26,8 @@ Provide HTTPS for services using Traefik with automatic certificate issuance and
   - httpChallenge enabled
   - challenge uses entrypoint `web`
 
+---
+
 ## Verification
 
 ### Check DNS
@@ -39,8 +41,9 @@ nslookup grafana.adiwoj.pl
 
 Both should resolve to the VPS IP.
 
+### Check HTTPS:
+
 ```bash
-Check HTTPS
 curl -I https://erp.adiwoj.pl
 curl -I https://grafana.adiwoj.pl
 ```
@@ -55,10 +58,29 @@ curl -I http://erp.adiwoj.pl
 
 Expected: 301/307/308 redirect to https.
 
-### Renewal
+---
+
+## Renewal
 
 Traefik renews certificates automatically.
 No cron job required.
+
+## Verify Renewal Configuration
+
+Check Traefik logs for ACME activity:
+
+```bash
+docker compose logs traefik | grep acme
+```
+
+## Let's Encrypt Rate Limits
+
+Be aware of Let's Encrypt rate limits when repeatedly recreating certificates.
+
+See:
+https://letsencrypt.org/docs/rate-limits/
+
+Avoid deleting acme.json unless necessary.
 
 ### Common failure modes
 

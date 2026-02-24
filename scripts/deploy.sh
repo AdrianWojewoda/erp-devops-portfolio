@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
+set -o errtrace
+
+trap 'echo "Deploy failed at line $LINENO"; exit 1' ERR
 
 REPO_DIR="/srv/erp/repo"
 RUNTIME_DIR="/srv/erp/app"
@@ -20,7 +23,6 @@ echo "==> Running containers:"
 docker ps
 
 echo "==> Done."
-echo "==> Smoke tests (wait up to 60s):"
 
 echo "==> Smoke tests (wait up to 60s):"
 

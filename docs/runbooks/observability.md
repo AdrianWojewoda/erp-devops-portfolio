@@ -2,61 +2,163 @@
 
 ## Scope
 
-This stack provides:
-- Traefik metrics (Prometheus)
-- Prometheus scraping (internal)
-- Grafana UI (via Traefik and HTTPS)
+This stack provides infrastructure-level observability:
+
+- Traefik metrics exporter
+- Prometheus scraping and storage
+- Grafana dashboards exposed via HTTPS
+
+Metrics flow:
+
+Traefik → Prometheus → Grafana
+
+---
 
 ## Access
 
-Grafana is exposed via Traefik:
+Grafana (public via Traefik):
 
-- https://grafana.adiwoj.pl
+https://grafana.adiwoj.pl
 
-Prometheus is NOT exposed publicly by default (recommended).
+Prometheus:
+- Internal-only
+- Not exposed to public network
+- Accessible only inside Docker network
 
-## What to check first
+---
 
-### 1) Containers up
+## Architecture Components
+
+### Traefik
+
+- Exposes Prometheus metrics on internal entrypoint `:8082`
+- Metrics enabled via `--metrics.prometheus=true`
+
+### Prometheus
+
+- Scrapes Traefik metrics
+- Config defined in:
+  infra/compose/prod/monitoring/prometheus.yml
+- Runs on internal Docker network
+
+### Grafana
+
+- Connected to Prometheus via internal service name
+- Provisioned using configuration as code
+- Exposed externally through Traefik
+
+---
+
+## Operational Checks
+
+### 1. Containers running
 
 ```bash
 cd /srv/erp/app
-docker ps
+docker compose ps
 ```
 
-Expected: traefik, prometheus, grafana running.
+Expected:
 
-### 2) Prometheus health (internal check)
+- traefik
+- prometheus
+- grafana
 
-Use a temporary curl container inside the same docker network:
+---
+
+### 2. Prometheus health (internal)
 
 ```bash
-docker run --rm --network app_default curlimages/curl:8.5.0 -sS http://prometheus:9090/-/healthy
+docker run --rm --network app_default \
+  curlimages/curl:8.5.0 \
+  -sS http://prometheus:9090/-/healthy
 ```
 
-Expected: Prometheus Server is Healthy.
+Expected:
 
-### 3) Traefik metrics endpoint (internal)
+- Prometheus Server is Healthy.
+
+---
+
+### 3. Traefik metrics endpoint
 
 ```bash
-docker run --rm --network app_default curlimages/curl:8.5.0 -sS http://traefik:8082/metrics | head
+docker run --rm --network app_default \
+  curlimages/curl:8.5.0 \
+  -sS http://traefik:8082/metrics | head
 ```
 
-### Expected Metrics
+Expected:
 
 - traefik_entrypoint_requests_total
 - traefik_router_requests_total
 - traefik_service_request_duration_seconds
 
-### Security Model
+---
 
-- Prometheus not exposed externally
-- Metrics endpoint not bound to public ports
+## Troubleshooting
+
+### Case 1: Grafana loads but shows "No data"
+
+Check:
+
+```bash
+docker compose logs prometheus --tail=100
+```
+
+Verify:
+
+- Prometheus is scraping successfully
+- No target errors
+
+### Case 2: Prometheus shows no targets
+
+Check scrape configuration:
+
+```bash
+cat infra/compose/prod/monitoring/prometheus.yml
+```
+
+Ensure:
+
+- Traefik target is correctly defined
+- Service name matches Docker network
+
+### Case 3: Traefik metrics not available
+
+Check Traefik logs:
+
+```bash
+docker compose logs traefik --tail=100
+```
+
+Verify:
+
+- metrics.prometheus=true enabled
+- Metrics entrypoint defined
+
+---
+
+## Data Persistence
+
+- Prometheus data stored in container filesystem (ephemeral unless volume configured)
+- Grafana provisioning stored in bind-mounted directory
+- Dashboards can be version-controlled
+
+---
+
+## Security Model
+
+- Prometheus not publicly exposed
+- Metrics endpoint internal-only
 - Grafana protected by credentials
+- TLS terminated at Traefik
 
-### Next improvements (planned)
+---
 
-- Add Loki for logs
-- Add Alertmanager
-- Add SLO dashboards
-- Add alert rules for 5xx rate
+## Planned Improvements
+
+- Loki for centralized logs
+- Alertmanager for alerting
+- SLO-based dashboards
+- Error-rate alert rules (5xx thresholds)
