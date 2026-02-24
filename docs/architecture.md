@@ -12,23 +12,13 @@
 ```mermaid
 flowchart LR
   U[User / Browser] -->|HTTPS| RP[Reverse Proxy: Traefik]
-  RP --> S1[Service: ERP (future)]
-  RP --> S2[Service: Grafana (observability)]
-  S1 --> DB[(PostgreSQL - future)]
+  RP --> S1[Service: ERP]
+  RP --> S2[Service: Grafana]
+  S1 --> DB(PostgreSQL]
   RP --> M[Metrics endpoint]
   M --> P[Prometheus]
   P --> G[Grafana]
 ```
-
-User/Browser
-    |
-   HTTPS
-    v
-  Traefik  --->  ERP App  --->  PostgreSQL
-    |
-    +----->  Grafana
-    |
-    +----->  Metrics  --->  Prometheus  --->  Grafana
 
 ## Containers (C4 - Level 2)
 
