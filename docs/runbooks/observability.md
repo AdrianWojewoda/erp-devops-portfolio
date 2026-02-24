@@ -42,20 +42,21 @@ Expected: Prometheus Server is Healthy.
 docker run --rm --network app_default curlimages/curl:8.5.0 -sS http://traefik:8082/metrics | head
 ```
 
-Expected: metrics output (e.g., go_* and traefik_* metrics).
+### Expected Metrics
 
-Grafana login
+- traefik_entrypoint_requests_total
+- traefik_router_requests_total
+- traefik_service_request_duration_seconds
 
-Credentials are configured via environment variables in compose:
+### Security Model
 
-GF_SECURITY_ADMIN_USER
-
-GF_SECURITY_ADMIN_PASSWORD
+- Prometheus not exposed externally
+- Metrics endpoint not bound to public ports
+- Grafana protected by credentials
 
 ### Next improvements (planned)
 
-Provision datasources/dashboards as code (Grafana provisioning).
-
-Add log aggregation (Loki + Promtail).
-
-Add alerts (Alertmanager) and SLO dashboards.
+- Add Loki for logs
+- Add Alertmanager
+- Add SLO dashboards
+- Add alert rules for 5xx rate
