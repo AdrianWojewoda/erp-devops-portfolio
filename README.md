@@ -62,7 +62,7 @@ CI (GitHub Actions):
 - YAML lint (yamllint)
 - Shell lint (ShellCheck)
 - Vulnerability scanning (Trivy) – optional/iterative
-- Trivy as gate
+- Trivy runs as a security gate and fails CI on HIGH/CRITICAL findings.
 
 > CI performs validation and security checks only.
 > CI fails on HIGH/CRITICAL

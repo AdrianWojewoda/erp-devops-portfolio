@@ -10,7 +10,7 @@ The format is based on Keep a Changelog, and this project loosely follows Semant
 ### Changed
 - CI now enforces Trivy as a security gate (fails on HIGH/CRITICAL vulnerabilities).
 ### Fixed
-- Security: upgraded fastAPI to >=0.128.3 to address CVE-2024-47874.
+- Security: Upgrade FastAPI/Starlette dependency chain to remediate CVE-2024-47874 and satisfy Trivy gate.
 
 ## [0.5.0] - 2026-02-25
 
