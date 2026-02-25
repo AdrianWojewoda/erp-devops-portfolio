@@ -1,5 +1,11 @@
 # ERP DevOps Portfolio
 
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Docker](https://img.shields.io/badge/docker-compose-blue)
+![Observability](https://img.shields.io/badge/observability-prometheus%20%2B%20grafana-orange)
+
+---
+
 Production-like infrastructure for a web-based ERP system running on a single Ubuntu VPS.
 
 ## What This Project Demonstrates
@@ -19,22 +25,48 @@ DevOps capabilities:
 
 ---
 
+## Repository Structure
+
+erp-devops-portfolio/
+│
+├── app/
+│ └── backend/ # FastAPI application
+│
+├── infra/
+│ └── compose/
+│ └── prod/ # Production Docker Compose definition
+│
+├── scripts/
+│ └── deploy.sh # Idempotent deployment script (VPS)
+│
+├── docs/
+│ ├── architecture.md # System architecture (C4 / Mermaid)
+│ ├── runbooks/ # Operational procedures
+│ └── adr/ # Architecture Decision Records
+│
+├── .github/workflows/ # CI pipeline definitions
+├── .yamllint # YAML lint configuration
+└── README.md
+
+---
+
 ## Current Milestone
 
-v0.4 – Reverse Proxy + TLS + Observability + Application Layer
+v0.5 – CI pipeline validation + security scanning
 
-Implemented:
+CI (GitHub Actions):
+- Validate Docker Compose configuration
+- Build backend image
+- YAML lint (yamllint)
+- Shell lint (ShellCheck)
+- Vulnerability scanning (Trivy) – optional/iterative
 
-- VPS hardening (SSH, UFW, Fail2ban)
-- Docker-based service isolation
-- Traefik reverse proxy (v3)
-- Automated HTTPS via Let's Encrypt (ACME HTTP-01)
-- Prometheus metrics collection
-- Grafana dashboards
-- FastAPI backend
-- PostgreSQL database
-- One-command deployment script
-- C4 documentation + ADR + runbooks
+> CI performs validation and security checks only.  
+> Continuous Deployment is intentionally not enabled; deployment remains SSH-based by design.
+
+Documentation:
+- [docs/runbooks/ci.md](docs/runbooks/ci.md) 
+- [ADR 0005-ci-pipeline.md](docs/adr/0005-ci-pipeline.md)
 
 ---
 
@@ -117,7 +149,7 @@ bash ./scripts/deploy.sh
 1. Pulls latest changes (fast-forward only)
 2. Validates compose configuration
 3. Builds and recreates containers
-4. Displays running containers
+4. Shows stack status (docker compose ps)
 5. Executes smoke tests:
 - GET /health
 - GET /readiness
@@ -133,12 +165,14 @@ Runbooks:
 - [docs/runbooks/deploy.md](docs/runbooks/deploy.md)
 - [docs/runbooks/ssl.md](docs/runbooks/ssl.md)
 - [docs/runbooks/observability.md](docs/runbooks/observability.md)
+- [docs/runbooks/ci.md](docs/runbooks/ci.md)
 
 Architecture Decisions:
-- [docs/adr/0001-traefik.md](docs/adr/0001-traefik.md)
-- [docs/adr/0002-letsencrypt.md](docs/adr/0002-letsencrypt.md)
-- [docs/adr/0003-observability.md](docs/adr/0003-observability.md)
-- [docs/adr/0004-deployment-model.md](docs/adr/0004-deployment-model.md)
+- [ADR 0001-traefik.md](docs/adr/0001-traefik.md)
+- [ADR 0002-letsencrypt.md](docs/adr/0002-letsencrypt.md)
+- [ADR 0003-observability.md](docs/adr/0003-observability.md)
+- [ADR 0004-deployment-model.md](docs/adr/0004-deployment-model.md)
+- [ADR 0005-ci-pipeline.md](docs/adr/0005-ci-pipeline.md)
 
 ---
 
@@ -168,14 +202,14 @@ Milestones:
 ## Roadmap
 
 - [x] FastAPI ERP backend
-- [x] PostgreSQL with migrations
-- [x] Healthchecks & readiness probes
-- [ ] CI pipeline validation
-- [ ] Container image scanning (Trivy)
+- [x] PostgreSQL (persistent volume)
+- [x] Health & readiness endpoints
+- [x] CI pipeline validation
+- [ ] Database migrations (Alembic)
+- [ ] Container image scanning (Trivy) as a gate
 - [ ] Loki (centralized logs)
 - [ ] Alertmanager
 - [ ] Infrastructure provisioning via Ansible
-- [ ] Database migrations (Alembic)
 
 ---
 
@@ -198,6 +232,3 @@ This repository documents the incremental evolution of a production-ready stack 
 
 ---
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Docker](https://img.shields.io/badge/docker-compose-blue)
-![Observability](https://img.shields.io/badge/observability-prometheus%20%2B%20grafana-orange)

@@ -28,12 +28,13 @@ echo "==> Smoke tests (wait up to 60s):"
 
 retry() {
   local name="$1"
-  local cmd="$2"
+  shift
+
   local attempts=30
   local delay=2
 
   for i in $(seq 1 "$attempts"); do
-    if eval "$cmd" >/dev/null 2>&1; then
+    if "$@" >/dev/null 2>&1; then
       echo "$name: OK"
       return 0
     fi
@@ -44,6 +45,5 @@ retry() {
   return 1
 }
 
-# Prefer local Traefik routing to avoid DNS/TLS flakiness:
-retry "ERP health"    'curl -fsS -H "Host: erp.adiwoj.pl" http://127.0.0.1/health'
-retry "ERP readiness" 'curl -fsS -H "Host: erp.adiwoj.pl" http://127.0.0.1/readiness'
+retry "ERP health" curl -fsS -H "Host: erp.adiwoj.pl" http://127.0.0.1/health
+retry "ERP readiness" curl -fsS -H "Host: erp.adiwoj.pl" http://127.0.0.1/readiness
