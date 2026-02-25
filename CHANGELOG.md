@@ -5,11 +5,33 @@ The format is based on Keep a Changelog, and this project loosely follows Semant
 
 ## [Unreleased]
 ### Added
-- CI workflow for validation (planned)
+- -
 ### Changed
 - -
 ### Fixed
 - -
+
+## [0.5.0] - 2026-02-23
+
+### Added
+- GitHub Actions CI pipeline
+- Docker Compose validation in CI
+- YAML linting (yamllint)
+- Shell script linting (ShellCheck)
+- Container image vulnerability scanning (Trivy)
+- ADR 0005: CI validation and security scanning
+- CI runbook documentation
+
+### Changed
+- Repository structure formalized
+- Deployment documentation refined
+- README updated to reflect CI maturity
+
+### Fixed
+- YAML formatting inconsistencies
+- ShellCheck warnings in deployment script
+
+---
 
 ## [0.4.0] - 2026-02-23
 ### Added
