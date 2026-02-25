@@ -1,0 +1,21 @@
+groups:
+  - name: erp-alerts
+    rules:
+
+      - alert: ERPDown
+        expr: up{job="backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "ERP backend is down"
+          description: "Backend container is not responding to Prometheus scrape."
+
+      - alert: High5xxRate
+        expr: rate(traefik_router_requests_total{code=~"5.."}[1m]) > 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High 5xx rate detected"
+          description: "Traefik reports 5xx errors for ERP service."
