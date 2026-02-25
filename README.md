@@ -27,6 +27,7 @@ DevOps capabilities:
 
 ## Repository Structure
 
+```
 erp-devops-portfolio/
 │
 ├── app/
@@ -47,6 +48,7 @@ erp-devops-portfolio/
 ├── .github/workflows/ # CI pipeline definitions
 ├── .yamllint # YAML lint configuration
 └── README.md
+```
 
 ---
 
