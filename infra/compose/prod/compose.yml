@@ -35,7 +35,7 @@ services:
     image: prom/prometheus:v2.52.0
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      
+
     restart: unless-stopped
 
   grafana:
