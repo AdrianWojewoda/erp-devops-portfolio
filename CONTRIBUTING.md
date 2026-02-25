@@ -18,11 +18,12 @@ External contributions are welcome but not required.
 
 Commits follow Conventional Commits style:
 
-- *feat:* new feature
-- *fix:* bug fix
-- *docs:* documentation update
-- *refactor:* code improvement without behavior change
-- *chore:* maintenance tasks
+- **feat:** new feature
+- **fix:** bug fix
+- **docs:** documentation update
+- **refactor:** code improvement without behavior change
+- **chore:** maintenance tasks
+- **ci:** pipeline validation tasks/fixes
 
 Example:
 

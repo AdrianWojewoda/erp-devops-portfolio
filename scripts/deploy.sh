@@ -38,6 +38,7 @@ retry() {
       echo "$name: OK"
       return 0
     fi
+    echo "$name: retry $i/$attempts..."
     sleep "$delay"
   done
 
