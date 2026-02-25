@@ -6,6 +6,7 @@ The format is based on Keep a Changelog, and this project loosely follows Semant
 ## [Unreleased]
 ### Added
 - .trivyignore for managed exceptions.
+- Trivy report uploaded as artifact
 ### Changed
 - CI now enforces Trivy as a security gate (fails on HIGH/CRITICAL vulnerabilities).
 ### Fixed

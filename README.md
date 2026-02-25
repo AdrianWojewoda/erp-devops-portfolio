@@ -64,7 +64,8 @@ CI (GitHub Actions):
 - Vulnerability scanning (Trivy) – optional/iterative
 - Trivy as gate
 
-> CI performs validation and security checks only.  
+> CI performs validation and security checks only.
+> CI fails on HIGH/CRITICAL
 > Continuous Deployment is intentionally not enabled; deployment remains SSH-based by design.
 
 Documentation:
@@ -211,7 +212,7 @@ Milestones:
 - [x] Health & readiness endpoints
 - [x] CI pipeline validation
 - [x] Container image scanning (Trivy) (reporting)
-- [ ] Container image scanning (Trivy) as a gate (fail on HIGH/CRITICAL)
+- [x] Container image scanning (Trivy) as a gate (fail on HIGH/CRITICAL)
 - [ ] Alertmanager
 - [ ] Loki (centralized logs)
 - [ ] Database migrations (Alembic)
