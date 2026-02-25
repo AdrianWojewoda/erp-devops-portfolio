@@ -100,7 +100,7 @@ services:
       - "traefik.http.routers.erp-secure.tls.certresolver=myresolver"
       - "traefik.http.services.erp.loadbalancer.server.port=8000"
     restart: unless-stopped
-  
+
   alertmanager:
     image: prom/alertmanager:v0.27.0
     volumes:
