@@ -31,6 +31,7 @@ Positive:
 - Faster feedback loop
 - Reduced runtime failures
 - Basic security gate
+- CI blocks merges/deploys if HIGH/CRITICAL vulnerabilities are detected.
 
 Trade-offs:
 - CI runtime cost (minutes)

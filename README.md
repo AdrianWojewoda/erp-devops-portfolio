@@ -62,6 +62,7 @@ CI (GitHub Actions):
 - YAML lint (yamllint)
 - Shell lint (ShellCheck)
 - Vulnerability scanning (Trivy) – optional/iterative
+- Trivy as gate
 
 > CI performs validation and security checks only.  
 > Continuous Deployment is intentionally not enabled; deployment remains SSH-based by design.
@@ -209,10 +210,11 @@ Milestones:
 - [x] PostgreSQL (persistent volume)
 - [x] Health & readiness endpoints
 - [x] CI pipeline validation
-- [ ] Database migrations (Alembic)
-- [ ] Container image scanning (Trivy) as a gate
-- [ ] Loki (centralized logs)
+- [x] Container image scanning (Trivy) (reporting)
+- [ ] Container image scanning (Trivy) as a gate (fail on HIGH/CRITICAL)
 - [ ] Alertmanager
+- [ ] Loki (centralized logs)
+- [ ] Database migrations (Alembic)
 - [ ] Infrastructure provisioning via Ansible
 
 ---
