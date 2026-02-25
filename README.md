@@ -193,11 +193,13 @@ Architecture Decisions:
 ## Versioning Strategy
 
 Milestones:
+
 - v0.1 – VPS hardening + Docker baseline
 - v0.2 – Traefik + Automated TLS
 - v0.3 – Observability stack
-- v0.4 – Application layer
-- v1.0 – Production-ready ERP stack
+- v0.4 – Application layer (backend + database + health checks)
+- v0.5 – CI validation and security scanning
+- v1.0 – Production-ready ERP infrastructure
 
 ---
 
