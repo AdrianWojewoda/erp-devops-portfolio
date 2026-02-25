@@ -22,6 +22,8 @@ DevOps capabilities:
 - Secure server baseline
 - Deployment automation
 - Architecture documentation
+- Security gating via container vulnerability scanning (Trivy)
+- Infrastructure-level alerting (Prometheus + Alertmanager)
 
 ---
 
@@ -54,23 +56,15 @@ erp-devops-portfolio/
 
 ## Current Milestone
 
-v0.5 – CI pipeline validation + security scanning
+v0.6 – Security Gate + Alerting Baseline
 
-CI (GitHub Actions):
-- Validate Docker Compose configuration
-- Build backend image
-- YAML lint (yamllint)
-- Shell lint (ShellCheck)
-- Vulnerability scanning (Trivy) – optional/iterative
-- Trivy runs as a security gate and fails CI on HIGH/CRITICAL findings.
+Implemented:
 
-> CI performs validation and security checks only.
-> CI fails on HIGH/CRITICAL
-> Continuous Deployment is intentionally not enabled; deployment remains SSH-based by design.
-
-Documentation:
-- [docs/runbooks/ci.md](docs/runbooks/ci.md) 
-- [ADR 0005-ci-pipeline.md](docs/adr/0005-ci-pipeline.md)
+- Trivy security scanning as CI gate (fail on HIGH/CRITICAL)
+- Prometheus alert rules
+- Alertmanager integration
+- Backend availability monitoring
+- 5xx rate monitoring via Traefik metrics
 
 ---
 
@@ -85,28 +79,32 @@ Documentation:
 
 ```mermaid
 flowchart LR
-  U[User] -->|HTTPS| T[Traefik]
-  T --> ERP[FastAPI Backend]
-  T --> G[Grafana]
-  ERP --> DB[(PostgreSQL)]
-  T --> M[Metrics Endpoint]
-  M --> P[Prometheus]
-  P --> G
+  User --> Traefik
+  Traefik --> Backend
+  Backend --> PostgreSQL
+  Traefik --> Prometheus
+  Prometheus --> Alertmanager
+  Prometheus --> Grafana
 ```
 ---
 
 ## Tech Stack
 
-|Layer |	Tool|
-|------|------|
-|OS	| Ubuntu 24|
-|Container Runtime	| Docker CE|
-|Reverse Proxy	| Traefik v3|
-|TLS	| Let's Encrypt|
-|Metrics	| Prometheus|
-|Visualization	| Grafana|
-|Firewall	| UFW|
-|Intrusion Protection	| Fail2ban|
+| Layer | Tool |
+|-------|------|
+| OS | Ubuntu 24 |
+| Container Runtime | Docker CE |
+| Reverse Proxy | Traefik v3 |
+| TLS | Let's Encrypt (ACME) |
+| Backend | FastAPI |
+| Database | PostgreSQL |
+| Metrics | Prometheus |
+| Alerting | Alertmanager |
+| Visualization | Grafana |
+| CI | GitHub Actions |
+| Security Scanning | Trivy |
+| Firewall | UFW |
+| Intrusion Protection | Fail2ban |
 
 ---
 
@@ -170,6 +168,7 @@ Runbooks:
 - [docs/runbooks/ssl.md](docs/runbooks/ssl.md)
 - [docs/runbooks/observability.md](docs/runbooks/observability.md)
 - [docs/runbooks/ci.md](docs/runbooks/ci.md)
+- [docs/runbooks/alerting.md](docs/runbooks/alerting.md)
 
 Architecture Decisions:
 - [ADR 0001-traefik.md](docs/adr/0001-traefik.md)
@@ -177,6 +176,7 @@ Architecture Decisions:
 - [ADR 0003-observability.md](docs/adr/0003-observability.md)
 - [ADR 0004-deployment-model.md](docs/adr/0004-deployment-model.md)
 - [ADR 0005-ci-pipeline.md](docs/adr/0005-ci-pipeline.md)
+- [ADR 0006-alerting.md](docs/adr/0006-alerting.md)
 
 ---
 
@@ -201,6 +201,7 @@ Milestones:
 - v0.3 – Observability stack
 - v0.4 – Application layer (backend + database + health checks)
 - v0.5 – CI validation and security scanning
+- v0.6 – Security Gate + Alerting Baseline
 - v1.0 – Production-ready ERP infrastructure
 
 ---
@@ -213,7 +214,7 @@ Milestones:
 - [x] CI pipeline validation
 - [x] Container image scanning (Trivy) (reporting)
 - [x] Container image scanning (Trivy) as a gate (fail on HIGH/CRITICAL)
-- [ ] Alertmanager
+- [x] Alertmanager baseline
 - [ ] Loki (centralized logs)
 - [ ] Database migrations (Alembic)
 - [ ] Infrastructure provisioning via Ansible

@@ -5,12 +5,31 @@ The format is based on Keep a Changelog, and this project loosely follows Semant
 
 ## [Unreleased]
 ### Added
+- -
+### Changed
+- -
+### Fixed
+- -
+---
+
+## [0.6.0] - 2026-02-25
+
+### Added
+- Alertmanager service
+- Prometheus alert rules (ERPDown, High5xxRate)
+- Backend scrape configuration
+- Alerting pipeline integrated with monitoring stack
 - .trivyignore for managed exceptions.
 - Trivy report uploaded as artifact
+- Security remediation workflow for dependency upgrades
+
 ### Changed
 - CI now enforces Trivy as a security gate (fails on HIGH/CRITICAL vulnerabilities).
+
 ### Fixed
-- Security: Upgrade FastAPI/Starlette dependency chain to remediate CVE-2024-47874 and satisfy Trivy gate.
+- Upgraded FastAPI/Starlette dependency chain to remediate CVE-2024-47874
+
+---
 
 ## [0.5.0] - 2026-02-25
 
