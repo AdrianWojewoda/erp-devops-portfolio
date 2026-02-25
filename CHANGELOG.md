@@ -11,7 +11,7 @@ The format is based on Keep a Changelog, and this project loosely follows Semant
 ### Fixed
 - -
 
-## [0.5.0] - 2026-02-23
+## [0.5.0] - 2026-02-25
 
 ### Added
 - GitHub Actions CI pipeline
@@ -33,7 +33,7 @@ The format is based on Keep a Changelog, and this project loosely follows Semant
 
 ---
 
-## [0.4.0] - 2026-02-23
+## [0.4.0] - 2026-02-24
 ### Added
 - FastAPI backend container with /health and /readiness
 - PostgreSQL service with persistent volume
