@@ -10,7 +10,7 @@ The format is based on Keep a Changelog, and this project loosely follows Semant
 ### Changed
 - CI now enforces Trivy as a security gate (fails on HIGH/CRITICAL vulnerabilities).
 ### Fixed
-- -
+- Security: upgraded Starlette to >=0.40.0 to address CVE-2024-47874.
 
 ## [0.5.0] - 2026-02-25
 
