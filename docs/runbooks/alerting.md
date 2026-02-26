@@ -37,7 +37,7 @@ Expected:
 
 ---
 
-### 2. Check alertmanager health
+### 2. Check Alertmanager health
 
 From inside Docker network:
 
@@ -48,40 +48,75 @@ docker run --rm --network app_default curlimages/curl:8.5.0 \
 
 Expected:
 
- - OK
+- OK
 
- ---
+---
 
- ### 3. CTrigger ERPDown alert (test)
+### 3. Check Prometheus health (internal)
 
- Stop backend:
+From inside Docker network:
 
- ```bash
+```bash
+docker run --rm --network app_default curlimages/curl:8.5.0 \
+  -sS http://prometheus:9090/-/healthy
+```
+
+Expected:
+
+- Prometheus Server is Healthy.
+
+---
+
+### 4. Validate backend metrics endpoint
+
+This validates that Prometheus can scrape the ERP backend. The backend must expose a Prometheus-compatible endpoint at `/metrics`.
+
+```bash
+docker run --rm --network app_default curlimages/curl:8.5.0 \
+  -sS http://backend:8000/metrics | head
+```
+
+Expected:
+
+- Prometheus text-format metrics output (multiple lines)
+
+---
+
+### 5. Trigger ERPDown alert (test)
+
+Stop backend:
+
+```bash
+cd /srv/erp/app
 docker compose stop backend
 ```
 
 Wait 1–2 minutes.
 
-Check Prometheus alerts UI:
+Check active alerts via Prometheus API (internal):
 
->http://<VPS_IP>:9090/alerts (internal access only)
+```bash
+docker run --rm --network app_default curlimages/curl:8.5.0 \
+  -sS http://prometheus:9090/api/v1/alerts | head
+```
 
 Restart backend:
 
- ```bash
+```bash
+cd /srv/erp/app
 docker compose start backend
 ```
 
 ---
 
-### Current Alerts
+## Current Alerts
 
-- ERPDown – backend not responding
-- igh5xxRate – HTTP 5xx responses detected via Traefik
+- ERPDown – backend not responding (based on Prometheus scrape `up{job="backend"}`)
+- High5xxRate – HTTP 5xx responses detected via Traefik
 
 ---
 
-### Security Model
+## Security Model
 
 - Alertmanager is not exposed publicly
 - No external receivers configured yet
