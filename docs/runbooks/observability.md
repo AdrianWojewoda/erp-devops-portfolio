@@ -102,17 +102,24 @@ Expected:
 
 ---
 
-### 4. Backend metrics endpoint
+### 4. Backend scrape verification (Prometheus view)
+
+Rather than testing DNS resolution inside individual containers, backend metrics health is verified via Prometheus target status.
 
 ```bash
 docker run --rm --network app_default \
   curlimages/curl:8.5.0 \
-  -sS http://backend:8000/metrics | head
+  -sS http://prometheus:9090/api/v1/targets | head
 ```
 
 Expected:
 
-- Prometheus text-format metrics output (multiple lines)
+- "job":"backend
+- "health":"up"
+
+Backend metrics endpoint remains available at:
+
+> http://backend:8000/metrics
 
 ---
 

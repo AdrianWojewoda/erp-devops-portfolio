@@ -67,18 +67,20 @@ Expected:
 
 ---
 
-### 4. Validate backend metrics endpoint
+### 4. Validate backend scrape status (via Prometheus API)
 
-This validates that Prometheus can scrape the ERP backend. The backend must expose a Prometheus-compatible endpoint at `/metrics`.
+This validates that Prometheus is successfully scraping the ERP backend metrics endpoint.Prometheus-compatible endpoint at `/metrics`.
 
 ```bash
 docker run --rm --network app_default curlimages/curl:8.5.0 \
-  -sS http://backend:8000/metrics | head
+  -sS http://prometheus:9090/api/v1/targets | head
 ```
 
 Expected:
 
-- Prometheus text-format metrics output (multiple lines)
+- "scrapeUrl":"http://backend:8000/metrics"
+- "health":"up"
+- "lastError":""
 
 ---
 
@@ -106,6 +108,9 @@ Restart backend:
 cd /srv/erp/app
 docker compose start backend
 ```
+
+After ~1–2 minutes:
+- Alert disappears (resolved)
 
 ---
 
