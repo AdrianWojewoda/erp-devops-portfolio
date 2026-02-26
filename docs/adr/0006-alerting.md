@@ -1,4 +1,3 @@
-
 # ADR 0006 – Alerting Strategy
 
 ## Status
@@ -19,6 +18,9 @@ Introduce:
   - Service availability (ERPDown)
   - HTTP error rate (High5xxRate)
 
+The ERP backend must expose Prometheus-compatible metrics (HTTP endpoint `/metrics`) so Prometheus can scrape it.
+`ERPDown` is evaluated based on the Prometheus scrape status (`up{job="backend"}`).
+
 Alertmanager runs internally and does not expose public endpoints.
 
 ## Rationale
@@ -30,5 +32,6 @@ Alertmanager runs internally and does not expose public endpoints.
 ## Consequences
 
 - Additional service in compose stack
+- Backend must provide a metrics endpoint for Prometheus scraping
 - Future extension possible (Slack, email, webhooks)
 - No external notification integration yet (intentional scope limit)

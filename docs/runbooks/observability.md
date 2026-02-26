@@ -5,12 +5,13 @@
 This stack provides infrastructure-level observability:
 
 - Traefik metrics exporter
+- Application metrics from ERP backend (Prometheus format)
 - Prometheus scraping and storage
 - Grafana dashboards exposed via HTTPS
 
 Metrics flow:
 
-Traefik → Prometheus → Grafana
+Traefik + Backend → Prometheus → Grafana
 
 ---
 
@@ -34,9 +35,14 @@ Prometheus:
 - Exposes Prometheus metrics on internal entrypoint `:8082`
 - Metrics enabled via `--metrics.prometheus=true`
 
+### Backend (ERP)
+
+- Exposes a Prometheus-compatible metrics endpoint at `/metrics`
+- Scraped by Prometheus via internal Docker network
+
 ### Prometheus
 
-- Scrapes Traefik metrics
+- Scrapes Traefik metrics and backend metrics
 - Config defined in:
   infra/compose/prod/monitoring/prometheus.yml
 - Runs on internal Docker network
@@ -96,6 +102,20 @@ Expected:
 
 ---
 
+### 4. Backend metrics endpoint
+
+```bash
+docker run --rm --network app_default \
+  curlimages/curl:8.5.0 \
+  -sS http://backend:8000/metrics | head
+```
+
+Expected:
+
+- Prometheus text-format metrics output (multiple lines)
+
+---
+
 ## Troubleshooting
 
 ### Case 1: Grafana loads but shows "No data"
@@ -121,8 +141,8 @@ cat infra/compose/prod/monitoring/prometheus.yml
 
 Ensure:
 
-- Traefik target is correctly defined
-- Service name matches Docker network
+- Targets are correctly defined
+- Service names match Docker network
 
 ### Case 3: Traefik metrics not available
 
@@ -150,7 +170,7 @@ Verify:
 ## Security Model
 
 - Prometheus not publicly exposed
-- Metrics endpoint internal-only
+- Metrics endpoints internal-only
 - Grafana protected by credentials
 - TLS terminated at Traefik
 
@@ -159,6 +179,6 @@ Verify:
 ## Planned Improvements
 
 - Loki for centralized logs
-- Alertmanager for alerting
+- Alert receiver integration (Slack / email / webhook)
 - SLO-based dashboards
 - Error-rate alert rules (5xx thresholds)
