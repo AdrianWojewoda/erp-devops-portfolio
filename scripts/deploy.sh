@@ -41,7 +41,7 @@ echo "==> Validating required files exist in runtime..."
 for f in \
   "$RUNTIME_DIR/infra/compose/prod/monitoring/prometheus.yml" \
   "$RUNTIME_DIR/infra/compose/prod/monitoring/rules/alerts.yml" \
-  "$RUNTIME_DIR/monitoring/alertmanager.yml"
+  "$RUNTIME_DIR/infra/compose/prod/monitoring/alertmanager.yml"
 do
   if [[ ! -f "$f" ]]; then
     echo "Missing file: $f"
