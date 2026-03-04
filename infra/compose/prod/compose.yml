@@ -34,8 +34,8 @@ services:
   prometheus:
     image: prom/prometheus:v2.52.0
     volumes:
-      - ./infra/compose/prod/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ./infra/compose/prod/monitoring/rules:/etc/prometheus/rules:ro
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/rules:/etc/prometheus/rules/*.yml:ro
 
     restart: unless-stopped
 
