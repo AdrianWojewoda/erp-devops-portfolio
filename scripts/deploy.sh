@@ -6,6 +6,12 @@ trap 'echo "Deploy failed at line $LINENO"; exit 1' ERR
 
 REPO_DIR="/srv/erp/repo"
 RUNTIME_DIR="/srv/erp/app"
+COMPOSE_FILE="$RUNTIME_DIR/compose.yml"
+if [[ ! -f "$COMPOSE_FILE" ]]; then
+  COMPOSE_FILE="$RUNTIME_DIR/infra/compose/prod/compose.yml"
+fi
+
+test -f "$COMPOSE_FILE" || { echo "Missing compose file in runtime"; exit 1; }
 
 echo "==> Updating repository..."
 cd "$REPO_DIR"
@@ -34,15 +40,11 @@ done
 echo "==> Validating compose config..."
 cd "$RUNTIME_DIR"
 export REPO_DIR="$REPO_DIR"
-docker compose config >/tmp/compose.config.out 2>/tmp/compose.config.err || {
-  echo "docker compose config failed:"
-  tail -n 80 /tmp/compose.config.err
-  exit 1
-}
+docker compose -f "$COMPOSE_FILE" config >/dev/null
 
 
 echo "==> Deploying (compose up)..."
-docker compose up -d --build
+docker compose -f "$COMPOSE_FILE" up -d --build
 
 echo "==> Running containers:"
 docker ps
