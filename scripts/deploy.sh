@@ -30,9 +30,12 @@ do
   fi
 done
 
+
 echo "==> Validating compose config..."
 cd "$RUNTIME_DIR"
+export REPO_DIR="$REPO_DIR"
 docker compose config >/dev/null
+
 
 echo "==> Deploying (compose up)..."
 docker compose up -d --build
