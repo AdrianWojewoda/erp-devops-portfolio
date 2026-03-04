@@ -21,6 +21,7 @@ echo "==> Syncing runtime directory..."
 rsync -a --delete --no-owner --no-group \
   --exclude '.git/' \
   --exclude '.github/' \
+  --exclude '.env' \
   "$REPO_DIR"/ "$RUNTIME_DIR"/
 
 echo "==> Validating required files exist in runtime..."
