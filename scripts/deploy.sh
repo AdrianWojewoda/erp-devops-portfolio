@@ -13,7 +13,7 @@ git fetch --all --prune
 git pull --ff-only
 
 echo "==> Syncing runtime directory..."
-rsync -a --delete \
+rsync -a --delete --no-owner --no-group \
   --exclude '.git/' \
   --exclude '.github/' \
   "$REPO_DIR"/ "$RUNTIME_DIR"/
