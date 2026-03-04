@@ -6,10 +6,9 @@ trap 'echo "Deploy failed at line $LINENO"; exit 1' ERR
 
 REPO_DIR="/srv/erp/repo"
 RUNTIME_DIR="/srv/erp/app"
-COMPOSE_FILE="$RUNTIME_DIR/compose.yml"
-if [[ ! -f "$COMPOSE_FILE" ]]; then
-  COMPOSE_FILE="$RUNTIME_DIR/infra/compose/prod/compose.yml"
-fi
+COMPOSE_FILE="$RUNTIME_DIR/infra/compose/prod/compose.yml"
+export COMPOSE_PROJECT_NAME="erp"
+export REPO_DIR="$REPO_DIR"
 
 test -f "$COMPOSE_FILE" || { echo "Missing compose file in runtime"; exit 1; }
 
