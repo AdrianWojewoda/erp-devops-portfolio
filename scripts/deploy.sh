@@ -12,6 +12,17 @@ cd "$REPO_DIR"
 git fetch --all --prune
 git pull --ff-only
 
+echo "==> Syncing runtime directory..."
+rsync -a --delete \
+  --exclude '.git/' \
+  --exclude '.github/' \
+  "$REPO_DIR"/ "$RUNTIME_DIR"/
+
+echo "==> Validating required files exist in runtime..."
+test -f "$RUNTIME_DIR/infra/compose/prod/monitoring/prometheus.yml"
+test -f "$RUNTIME_DIR/infra/compose/prod/monitoring/rules/alerts.yml"
+test -f "$RUNTIME_DIR/monitoring/alertmanager.yml"
+
 echo "==> Validating compose config..."
 cd "$RUNTIME_DIR"
 docker compose config >/dev/null
