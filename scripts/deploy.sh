@@ -43,7 +43,7 @@ export REPO_DIR="$REPO_DIR"
 # Load runtime env (kept outside git)
 if [[ -f "$RUNTIME_DIR/.env" ]]; then
   set -a
-  # shellcheck disable=SC1090
+  # shellcheck disable=SC1091
   source "$RUNTIME_DIR/.env"
   set +a
 fi
