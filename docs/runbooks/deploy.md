@@ -190,6 +190,7 @@ docker compose up -d
 - Never expose Postgres or Prometheus externally.
 - ACME storage (acme.json) must never be committed.
 - Runtime secrets should live in /srv/erp/app/.env (not in git).
+- Compose project name is pinned: COMPOSE_PROJECT_NAME=erp to avoid duplicate stacks.
 
 ## **Known issues**
 
