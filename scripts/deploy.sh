@@ -34,7 +34,11 @@ done
 echo "==> Validating compose config..."
 cd "$RUNTIME_DIR"
 export REPO_DIR="$REPO_DIR"
-docker compose config >/dev/null
+docker compose config >/tmp/compose.config.out 2>/tmp/compose.config.err || {
+  echo "docker compose config failed:"
+  tail -n 80 /tmp/compose.config.err
+  exit 1
+}
 
 
 echo "==> Deploying (compose up)..."
