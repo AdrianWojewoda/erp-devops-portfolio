@@ -6,11 +6,16 @@ trap 'echo "Deploy failed at line $LINENO"; exit 1' ERR
 
 REPO_DIR="/srv/erp/repo"
 RUNTIME_DIR="/srv/erp/app"
-COMPOSE_FILE="$RUNTIME_DIR/infra/compose/prod/compose.yml"
-export COMPOSE_PROJECT_NAME="erp"
-export REPO_DIR="$REPO_DIR"
 
-test -f "$COMPOSE_FILE" || { echo "Missing compose file in runtime"; exit 1; }
+# Always deploy under a single compose project name
+export COMPOSE_PROJECT_NAME="erp"
+
+# Compose file path (single source of truth)
+COMPOSE_FILE="$RUNTIME_DIR/infra/compose/prod/compose.yml"
+if [[ ! -f "$COMPOSE_FILE" ]]; then
+  echo "Missing compose file: $COMPOSE_FILE"
+  exit 1
+fi
 
 echo "==> Updating repository..."
 cd "$REPO_DIR"
@@ -24,23 +29,7 @@ rsync -a --delete --no-owner --no-group \
   --exclude '.env' \
   "$REPO_DIR"/ "$RUNTIME_DIR"/
 
-echo "==> Validating required files exist in runtime..."
-for f in \
-  "$RUNTIME_DIR/infra/compose/prod/monitoring/prometheus.yml" \
-  "$RUNTIME_DIR/infra/compose/prod/monitoring/rules/alerts.yml" \
-  "$RUNTIME_DIR/infra/compose/prod/monitoring/alertmanager.yml"
-do
-  if [[ ! -f "$f" ]]; then
-    echo "Missing file: $f"
-    exit 1
-  fi
-done
-
-
-echo "==> Validating compose config..."
-cd "$RUNTIME_DIR"
-export REPO_DIR="$REPO_DIR"
-# Load runtime env (kept outside git)
+echo "==> Loading runtime env (.env)..."
 if [[ -f "$RUNTIME_DIR/.env" ]]; then
   set -a
   # shellcheck disable=SC1091
@@ -48,18 +37,43 @@ if [[ -f "$RUNTIME_DIR/.env" ]]; then
   set +a
 fi
 
-# Ensure required vars are set
+echo "==> Validating required files exist in runtime..."
+for f in \
+  "$RUNTIME_DIR/infra/compose/prod/monitoring/prometheus.yml" \
+  "$RUNTIME_DIR/infra/compose/prod/monitoring/rules/alerts.yml" \
+  "$RUNTIME_DIR/monitoring/alertmanager.yml"
+do
+  if [[ ! -f "$f" ]]; then
+    echo "Missing file: $f"
+    exit 1
+  fi
+done
+
+# Optional: fail early if Grafana password is missing (recommended)
 : "${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD is not set (define it in $RUNTIME_DIR/.env)}"
+
+# Guard: prevent the "rules/*.yml is a directory" bug
+if [[ -d "$RUNTIME_DIR/infra/compose/prod/monitoring/rules/*.yml" ]]; then
+  echo "Invalid runtime state: rules/*.yml is a directory (should not exist)."
+  exit 1
+fi
+
+echo "==> Validating compose config..."
+cd "$RUNTIME_DIR"
 docker compose -f "$COMPOSE_FILE" config >/dev/null
 
+# Optional cleanup: if someone accidentally started a different project earlier
+# This prevents "two stacks" (prod_*) from lingering and grabbing ports.
+if docker ps --format '{{.Names}}' | grep -q '^prod-'; then
+  echo "==> Cleaning up accidental 'prod' project..."
+  docker compose -p prod down || true
+fi
 
 echo "==> Deploying (compose up)..."
 docker compose -f "$COMPOSE_FILE" up -d --build
 
 echo "==> Running containers:"
-docker ps
-
-echo "==> Done."
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
 echo "==> Smoke tests (wait up to 60s):"
 
@@ -85,3 +99,5 @@ retry() {
 
 retry "ERP health" curl -fsS -H "Host: erp.adiwoj.pl" http://127.0.0.1/health
 retry "ERP readiness" curl -fsS -H "Host: erp.adiwoj.pl" http://127.0.0.1/readiness
+
+echo "==> Done."
