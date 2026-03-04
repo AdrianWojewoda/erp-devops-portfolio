@@ -40,6 +40,16 @@ done
 echo "==> Validating compose config..."
 cd "$RUNTIME_DIR"
 export REPO_DIR="$REPO_DIR"
+# Load runtime env (kept outside git)
+if [[ -f "$RUNTIME_DIR/.env" ]]; then
+  set -a
+  # shellcheck disable=SC1090
+  source "$RUNTIME_DIR/.env"
+  set +a
+fi
+
+# Ensure required vars are set
+: "${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD is not set (define it in $RUNTIME_DIR/.env)}"
 docker compose -f "$COMPOSE_FILE" config >/dev/null
 
 
