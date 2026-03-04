@@ -19,9 +19,16 @@ rsync -a --delete --no-owner --no-group \
   "$REPO_DIR"/ "$RUNTIME_DIR"/
 
 echo "==> Validating required files exist in runtime..."
-test -f "$RUNTIME_DIR/infra/compose/prod/monitoring/prometheus.yml"
-test -f "$RUNTIME_DIR/infra/compose/prod/monitoring/rules/alerts.yml"
-test -f "$RUNTIME_DIR/monitoring/alertmanager.yml"
+for f in \
+  "$RUNTIME_DIR/infra/compose/prod/monitoring/prometheus.yml" \
+  "$RUNTIME_DIR/infra/compose/prod/monitoring/rules/alerts.yml" \
+  "$RUNTIME_DIR/infra/compose/prod/monitoring/alertmanager.yml"
+do
+  if [[ ! -f "$f" ]]; then
+    echo "Missing file: $f"
+    exit 1
+  fi
+done
 
 echo "==> Validating compose config..."
 cd "$RUNTIME_DIR"
