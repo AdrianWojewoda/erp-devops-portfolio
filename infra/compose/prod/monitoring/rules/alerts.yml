@@ -12,10 +12,15 @@ groups:
           description: "Backend container is not responding to Prometheus scrape."
 
       - alert: High5xxRate
-        expr: rate(traefik_router_requests_total{code=~"5.."}[1m]) > 0
+        expr: |
+          (
+            sum(rate(traefik_router_requests_total{code=~"5.."}[2m]))
+            /
+            sum(rate(traefik_router_requests_total[2m]))
+          ) > 0.05
         for: 2m
         labels:
           severity: warning
         annotations:
           summary: "High 5xx rate detected"
-          description: "Traefik reports 5xx errors for ERP service."
+          description: "More than 5% of requests return HTTP 5xx."
